@@ -8,6 +8,7 @@
 .PHONY: help init-env up down logs status seed-db audit-spdx audit-zero-bundling lint-compose
 
 COMPOSE_FILE := deploy/docker-compose.yml
+ENV_FILE     := .env
 
 help:
 	@echo "========================================================================"
@@ -24,11 +25,11 @@ help:
 	@echo "  make lint-compose         : Kiểm tra tính hợp lệ của cấu hình Docker Compose"
 
 init-env:
-	@if [ ! -f .env ]; then cp .env.example .env && echo "[DX-TwinOS] Đã tạo .env từ .env.example"; else echo "[DX-TwinOS] File .env đã tồn tại."; fi
+	@if [ ! -f $(ENV_FILE) ]; then cp .env.example $(ENV_FILE) && echo "[DX-TwinOS] Đã tạo .env từ .env.example"; else echo "[DX-TwinOS] File .env đã tồn tại."; fi
 
 up: init-env
 	@echo "[DX-TwinOS] Đang khởi chạy Tầng 1 (Headless PaaS: Keycloak, Traefik, Postgres, RustFS, Kestra) & Tầng 2..."
-	docker compose -f $(COMPOSE_FILE) up -d
+	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) up -d
 
 down:
 	@echo "[DX-TwinOS] Đang tắt toàn bộ hệ thống..."
@@ -46,10 +47,10 @@ seed-db:
 
 audit-spdx:
 	@echo "[PoF Audit #2] Kiểm tra nhãn SPDX-FileCopyrightText & SPDX-License-Identifier: Apache-2.0..."
-	@grep -rnL "SPDX-License-Identifier: Apache-2.0" \
+	@! grep -rnL "SPDX-License-Identifier: Apache-2.0" \
 		Makefile .gitignore .env.example README.md CHANGELOG.md CONTRIBUTING.md \
-		.github/ core/ apps/ deploy/ || true
-	@echo "[PoF Audit #2] Hoàn tất đối soát nhãn bản quyền SPDX!"
+		.github/ core/ apps/ deploy/
+	@echo "[PoF Audit #2] Hoàn tất đối soát nhãn bản quyền SPDX (100% đạt chuẩn)!"
 
 audit-zero-bundling:
 	@echo "[PoF Audit #3] Kiểm tra chính sách Zero-Bundling (không chứa thư mục vendor/external và file nén/nhị phân)..."
@@ -58,5 +59,5 @@ audit-zero-bundling:
 
 lint-compose: init-env
 	@echo "[GitOps Audit] Kiểm tra cú pháp deploy/docker-compose.yml..."
-	docker compose -f $(COMPOSE_FILE) config -q
+	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) config -q
 	@echo "[GitOps Audit] Cấu hình Docker Compose hợp lệ!"
