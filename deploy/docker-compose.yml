@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 DX-TwinOS Contributors. Licensed under the Apache License, Version 2.0.
+
+services:
+  # =========================================================================
+  # 1. API GATEWAY & REVERSE PROXY (Traefik - Apache-2.0)
+  # Chốt chặn duy nhất nhận request từ Tầng 2, ẩn hoàn toàn Tầng 1 (Headless)
+  # =========================================================================
+  gateway-traefik:
+    image: traefik:v3.1
+    container_name: dxos-gateway
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8000:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../core/gateway-traefik:/etc/traefik/dynamic:ro
+    networks:
+      - dxos-internal
+
+  # =========================================================================
+  # 2. UNIFIED IDENTITY & SSO (Keycloak - Apache-2.0)
+  # Cấp phát JWT Token & RBAC cho Con người + AI Agent (Không mở UI cho End-user)
+  # =========================================================================
+  identity-keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: dxos-keycloak
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KC_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-dxos_secret_2026}
+      KC_HTTP_RELATIVE_PATH: /auth
+    volumes:
+      - ../core/identity-keycloak/realm-dxos.json:/opt/keycloak/data/import/realm-dxos.json:ro
+    networks:
+      - dxos-internal
+
+  # =========================================================================
+  # 3A. STRUCTURED DATA ENGINE (PostgreSQL 16 - PostgreSQL License)
+  # Single Source of Truth (SSOT) cho dữ liệu định형 + Bảng Data Lineage
+  # =========================================================================
+  data-postgres:
+    image: postgres:16-alpine
+    container_name: dxos-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dxos_ssot}
+      POSTGRES_USER: ${POSTGRES_USER:-dxos_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dxos_pass_2026}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - dxos-internal
+
+  # =========================================================================
+  # 3B. UNSTRUCTURED OBJECT STORAGE (RustFS - Apache-2.0)
+  # Kho lưu trữ S3-compatible tốc độ cao bằng Rust (Thay thế MinIO AGPLv3)
+  # =========================================================================
+  data-rustfs:
+    image: rustfs/rustfs:latest
+    container_name: dxos-rustfs
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-dxos_s3_key}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-dxos_s3_secret_2026}
+    volumes:
+      - rustfs_data:/data
+    networks:
+      - dxos-internal
+
+  # =========================================================================
+  # 4. HEADLESS WORKFLOW ENGINE (Kestra - Apache-2.0)
+  # Động cơ điều phối quy trình bằng YAML/API (Thay thế n8n Sustainable Use)
+  # =========================================================================
+  workflow-kestra:
+    image: kestra/kestra:latest
+    container_name: dxos-kestra
+    command: server standalone
+    volumes:
+      - ../core/workflow-kestra/flows:/app/flows:ro
+    networks:
+      - dxos-internal
+
+networks:
+  dxos-internal:
+    driver: bridge
+
+volumes:
+  pgdata:
+  rustfs_data:

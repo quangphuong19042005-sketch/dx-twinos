@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: 2026 DX-TwinOS Contributors
+# SPDX-License-Identifier: Apache-2.0
+# =============================================================================
+# DX-TwinOS Git Ignore Rules — Chuẩn PoF (Principles of Openness / VFOSSA)
+# Chặn tuyệt đối: Bí mật môi trường, thư mục bên thứ 3 (Zero-Bundling),
+# bộ nhớ đệm và các tệp nhị phân/nén bị cấm trong kho mã nguồn mở.
+# =============================================================================
+
+# 1. Environment & Secrets (Zero-Secret Leak)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# 2. Third-Party Bundling Prevention (Zero-Bundling Policy - PoF Criterion #3)
+external/
+vendor/
+third_party/
+node_modules/
+bower_components/
+
+# 3. Python / FastAPI / Agentic Brain Runtime & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# 4. Forbidden Binary & Archive Artifacts in PoF Repository
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.exe
+*.dll
+*.so
+*.dylib
+*.jar
+*.war
+*.ear
+*.class
+*.bin
+*.iso
+
+# 5. Local Data Volumes & IDE Artifacts
+pgdata/
+rustfs_data/
+kestra_data/
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+*.duckdb.wal
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

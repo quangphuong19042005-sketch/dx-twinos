@@ -1,0 +1,102 @@
+{
+  "_spdx_copyright": "SPDX-FileCopyrightText: 2026 DX-TwinOS Contributors",
+  "_spdx_license": "SPDX-License-Identifier: Apache-2.0",
+  "_description": "Chính sách phân quyền S3 Bucket trên RustFS theo cấu trúc tri thức P.A.R.A (Projects, Areas, Resources, Archives)",
+  "Version": "2012-10-17",
+  "Bucket": "dxos-para-vault",
+  "ParaDirectoryTopology": {
+    "projects/": "Các luồng công việc đang triển khai có thời hạn rõ ràng (VD: hồ sơ lô hàng PO-2026-0089, hóa đơn chờ duyệt)",
+    "areas/": "Các mảng vận hành liên tục cần duy trì chuẩn mực (VD: biên bản kiểm định kho lạnh, nhật ký cảm biến OT định kỳ)",
+    "resources/": "Kho tri thức tham chiếu, quy chuẩn SOP, mẫu biểu Poka-yoke và tài liệu huấn luyện RAG cho Tác tử AI",
+    "archives/": "Hồ sơ giao dịch đã hoàn tất đối soát 3 chiều và đóng sổ cái (Chế độ Read-Only / WORM chống chỉnh sửa)"
+  },
+  "Statement": [
+    {
+      "Sid": "1_Projects_ActiveProcureToPayReadWrite",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": [
+          "urn:dxos:role:warehouse_operator",
+          "urn:dxos:role:ai_agent_service",
+          "urn:dxos:role:approver_manager"
+        ]
+      },
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::dxos-para-vault/projects/*"
+      ]
+    },
+    {
+      "Sid": "2_Areas_ContinuousOperationsAndAudit",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": [
+          "urn:dxos:role:warehouse_operator",
+          "urn:dxos:role:finance_auditor",
+          "urn:dxos:role:ai_agent_service"
+        ]
+      },
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::dxos-para-vault/areas/*"
+      ]
+    },
+    {
+      "Sid": "3_Resources_KnowledgeBaseAndRagReference",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": [
+          "urn:dxos:role:warehouse_operator",
+          "urn:dxos:role:finance_auditor",
+          "urn:dxos:role:approver_manager",
+          "urn:dxos:role:ai_agent_service"
+        ]
+      },
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::dxos-para-vault/resources/*"
+      ]
+    },
+    {
+      "Sid": "4_Archives_ImmutableAuditTrailReadOnly",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": [
+          "urn:dxos:role:finance_auditor",
+          "urn:dxos:role:approver_manager"
+        ]
+      },
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::dxos-para-vault/archives/*"
+      ]
+    },
+    {
+      "Sid": "5_Archives_StrictDenyDeleteOrOverwrite",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": [
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion"
+      ],
+      "Resource": [
+        "arn:aws:s3:::dxos-para-vault/archives/*"
+      ]
+    }
+  ]
+}

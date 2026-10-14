@@ -1,0 +1,30 @@
+DX-TwinOS: Open-Core Enterprise Digital Operating System
+Copyright 2026 DX-TwinOS Team (OLP 2026 - Phần mềm Nguồn mở)
+
+This product includes configuration and integration interfaces for the following
+OSI-Approved Open Source Software components (pulled dynamically via container
+registries without bundling third-party source code):
+
+1. Keycloak (https://www.keycloak.org/)
+   - Role: Tier 1 Unified Identity & SSO (OIDC / OAuth2 / RBAC)
+   - License: Apache License 2.0 (OSI-Approved)
+
+2. Traefik Proxy (https://traefik.io/)
+   - Role: Tier 1 API Gateway & Zero-Trust Reverse Proxy
+   - License: MIT License (OSI-Approved)
+
+3. PostgreSQL (https://www.postgresql.org/)
+   - Role: Tier 1 Structured Data Engine (Single Source of Truth)
+   - License: PostgreSQL License (OSI-Approved)
+
+4. RustFS (https://github.com/rustfs/rustfs)
+   - Role: Tier 1 High-Performance S3-Compatible Object Storage
+   - License: Apache License 2.0 (OSI-Approved)
+
+5. Kestra (https://kestra.io/)
+   - Role: Tier 1 Declarative Headless Workflow Engine
+   - License: Apache License 2.0 (OSI-Approved)
+
+6. DuckDB (https://duckdb.org/)
+   - Role: Tier 2 In-Process OLAP Analytics Engine
+   - License: MIT License (OSI-Approved)

@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 DX-TwinOS Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+id: procure_to_pay_autonomous
+namespace: dxos.supplychain
+description: "Luồng tự động hóa H-P-D-I có chốt chặn Human-in-the-loop"
+
+inputs:
+  - id: invoice_id
+    type: STRING
+  - id: s3_document_uri
+    type: STRING
+
+tasks:
+  - id: step_1_ai_ocr_and_audit
+    type: io.kestra.plugin.core.http.Request
+    uri: "http://agent-brain:8080/api/v1/agents/audit-invoice"
+    method: POST
+    contentType: application/json
+    body: |
+      {
+        "invoice_id": "{{ inputs.invoice_id }}",
+        "s3_uri": "{{ inputs.s3_document_uri }}"
+      }
+
+  - id: step_2_human_in_the_loop_gate
+    type: io.kestra.plugin.core.flow.Pause
+    description: "Tạm dừng chờ Quản lý bấm [Approve] trên giao diện Tầng 2"
+
+  - id: step_3_commit_ssot_and_lineage
+    type: io.kestra.plugin.core.http.Request
+    uri: "http://agent-brain:8080/api/v1/agents/commit-ledger"
+    method: POST

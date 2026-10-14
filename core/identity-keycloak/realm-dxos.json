@@ -1,0 +1,41 @@
+{
+  "_spdx_copyright": "SPDX-FileCopyrightText: 2026 DX-TwinOS Contributors",
+  "_comment": "SPDX-License-Identifier: Apache-2.0 | Cấu hình Keycloak Realm do đội thi tự thiết kế",
+  "realm": "dx-twinos",
+  "enabled": true,
+  "displayName": "DX-TwinOS Enterprise Identity",
+  "roles": {
+    "realm": [
+      {
+        "name": "warehouse_operator",
+        "description": "[H] Nhân viên vận hành kho - Tải chứng từ & nhập biểu mẫu Poka-yoke"
+      },
+      {
+        "name": "finance_auditor",
+        "description": "[P/D] Kế toán kiểm toán - Giám sát Single Source of Truth"
+      },
+      {
+        "name": "approver_manager",
+        "description": "[I] Chốt chặn Human-in-the-loop - Phê duyệt quyết định của AI Agent"
+      },
+      {
+        "name": "ai_agent_service",
+        "description": "[I] Định danh dành riêng cho Tác tử AI (Zero-Trust Machine Identity)"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "dxos-workspace-ui",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["http://localhost:8000/*"]
+    },
+    {
+      "clientId": "dxos-agent-brain",
+      "enabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false
+    }
+  ]
+}

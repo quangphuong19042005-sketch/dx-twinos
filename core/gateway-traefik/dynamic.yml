@@ -1,0 +1,138 @@
+# SPDX-FileCopyrightText: 2026 DX-TwinOS Contributors
+# SPDX-License-Identifier: Apache-2.0
+# =============================================================================
+# DX-TwinOS Tier-1 Zero-Trust API Gateway Configuration (Traefik v3.1 Dynamic)
+# - Chốt chặn duy nhất (Single Entrypoint) tại cổng :8000
+# - Ẩn hoàn toàn giao diện quản trị của các dịch vụ Tầng 1 (Headless PaaS)
+# - Xác thực tập trung OIDC/JWT do Keycloak cấp phát cho Con người & AI Agent
+# =============================================================================
+
+http:
+  # ---------------------------------------------------------------------------
+  # 1. ROUTERS — Định tuyến hợp nhất vào Không gian Năng lực Tầng 2 & API Lõi
+  # ---------------------------------------------------------------------------
+  routers:
+    # 1.1. Luồng cấp phát Token OIDC/OAuth2 từ Keycloak (Chỉ mở endpoint /auth/realms/dx-twinos)
+    keycloak-oidc-router:
+      rule: "PathPrefix(`/auth/realms/dx-twinos`)"
+      entryPoints:
+        - web
+      service: keycloak-iam-service
+      middlewares:
+        - security-headers
+        - rate-limit-guard
+
+    # 1.2. Cổng giao tiếp Không gian Năng lực Tầng 2 & Tác tử AI (Agentic Brain API)
+    agent-brain-router:
+      rule: "PathPrefix(`/api/v1/agents`) || PathPrefix(`/api/v1/workspace`)"
+      entryPoints:
+        - web
+      service: agent-brain-service
+      middlewares:
+        - security-headers
+        - cors-policy
+        - keycloak-jwt-forward-auth
+        - lineage-context-injector
+
+    # 1.3. Cổng kích hoạt Quy trình Khai báo Kestra (Headless Webhook & Human-in-the-loop Resume)
+    kestra-workflow-router:
+      rule: "PathPrefix(`/api/v1/executions`)"
+      entryPoints:
+        - web
+      service: kestra-headless-service
+      middlewares:
+        - security-headers
+        - keycloak-jwt-forward-auth
+        - lineage-context-injector
+
+    # 1.4. Cổng truy xuất Hồ sơ số S3 P.A.R.A qua Presigned URL (RustFS Object Storage)
+    rustfs-s3-router:
+      rule: "PathPrefix(`/s3/dxos-para-vault`)"
+      entryPoints:
+        - web
+      service: rustfs-storage-service
+      middlewares:
+        - security-headers
+        - keycloak-jwt-forward-auth
+
+  # ---------------------------------------------------------------------------
+  # 2. MIDDLEWARES — Chính sách Bảo mật Zero-Trust & Kiểm soát Định danh
+  # ---------------------------------------------------------------------------
+  middlewares:
+    # 2.1. Xác thực JWT/OIDC qua Keycloak UserInfo/Token Introspection
+    keycloak-jwt-forward-auth:
+      forwardAuth:
+        address: "http://identity-keycloak:8080/auth/realms/dx-twinos/protocol/openid-connect/userinfo"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-Forwarded-User"
+          - "X-Keycloak-Sub"
+          - "X-Keycloak-Roles"
+
+    # 2.2. Tự động gắn nhãn ngữ cảnh để phục vụ Sổ cái Truy vết (Data Lineage)
+    lineage-context-injector:
+      headers:
+        customRequestHeaders:
+          X-DXOS-Gateway: "traefik-zero-trust-v3.1"
+          X-DXOS-Lineage-Enforced: "true"
+
+    # 2.3. Bảo vệ chống tấn công tràn lưu lượng (Rate Limiting)
+    rate-limit-guard:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1s
+
+    # 2.4. Thiết lập Header bảo mật chuẩn OWASP
+    security-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        ReferrerPolicy: "strict-origin-when-cross-origin"
+        customResponseHeaders:
+          X-Powered-By: "DX-TwinOS-Headless-PaaS"
+
+    # 2.5. Chính sách CORS cho Giao diện Không gian Làm việc Tầng 2 (Workspace UI)
+    cors-policy:
+      headers:
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "PATCH"
+          - "OPTIONS"
+        accessControlAllowOriginList:
+          - "http://localhost:3000"
+          - "http://localhost:8000"
+        accessControlAllowHeaders:
+          - "Authorization"
+          - "Content-Type"
+          - "X-Request-ID"
+          - "X-Lineage-Trace-ID"
+        accessControlMaxAge: 86400
+        addVaryHeader: true
+
+  # ---------------------------------------------------------------------------
+  # 3. SERVICES — Kết nối Nội bộ Tầng 1 & Tầng 2 (Mạng Docker dxos-internal)
+  # ---------------------------------------------------------------------------
+  services:
+    keycloak-iam-service:
+      loadBalancer:
+        servers:
+          - url: "http://identity-keycloak:8080"
+
+    agent-brain-service:
+      loadBalancer:
+        servers:
+          - url: "http://agent-brain:8080"
+
+    kestra-headless-service:
+      loadBalancer:
+        servers:
+          - url: "http://workflow-kestra:8080"
+
+    rustfs-storage-service:
+      loadBalancer:
+        servers:
+          - url: "http://data-rustfs:9000"
