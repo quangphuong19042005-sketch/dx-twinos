@@ -64,36 +64,20 @@ SPDX-License-Identifier: Apache-2.0
 <details>
 <summary>Bấm để mở rộng mục lục</summary>
 
-- [1. Bài toán & 6 Điểm đau Thực tế](#1-bài-toán--6-điểm-đau-thực-tế)
-- [2. Khởi chạy Nhanh (Quick Start — 1 Câu lệnh)](#-2-khởi-chạy-nhanh-quick-start--1-câu-lệnh)
-- [3. Danh mục Công nghệ Lõi Nguồn mở (Technology Stack)](#️-3-danh-mục-công-nghệ-lõi-nguồn-mở-technology-stack)
-- [4. Cấu trúc Cây Thư mục Chuẩn PoF & GitOps](#-4-cấu-trúc-cây-thư-mục-chuẩn-pof--gitops)
-- [5. Bảng Tham chiếu Lệnh Tự động hóa (`just` & `make`)](#-5-bảng-tham-chiếu-lệnh-tự-động-hóa-just--make)
-- [6. Tuân thủ Bộ Tiêu chí Nguồn mở Quốc gia (PoF 50/50)](#-6-tuân-thủ-bộ-tiêu-chí-nguồn-mở-quốc-gia-pof-5050)
-- [7. Hệ thống Tài liệu Kỹ thuật (Documentation)](#-7-hệ-thống-tài-liệu-kỹ-thuật-documentation)
-- [8. Đóng góp & Cộng đồng (Contributing)](#-8-đóng-góp--cộng-đồng-contributing)
-- [9. Đơn vị Tổ chức & Thống kê Dự án](#-9-đơn-vị-tổ-chức--thống-kê-dự-án)
+- [1. Khởi chạy Nhanh (Quick Start — 1 Câu lệnh)](#-1-khởi-chạy-nhanh-quick-start--1-câu-lệnh)
+- [2. Danh mục Công nghệ Lõi Nguồn mở (Technology Stack)](#️-2-danh-mục-công-nghệ-lõi-nguồn-mở-technology-stack)
+- [3. Cấu trúc Cây Thư mục Chuẩn PoF & GitOps](#-3-cấu-trúc-cây-thư-mục-chuẩn-pof--gitops)
+- [4. Bảng Tham chiếu Lệnh Tự động hóa (`just` & `make`)](#-4-bảng-tham-chiếu-lệnh-tự-động-hóa-just--make)
+- [5. Tuân thủ Bộ Tiêu chí Nguồn mở Quốc gia (PoF 50/50)](#-5-tuân-thủ-bộ-tiêu-chí-nguồn-mở-quốc-gia-pof-5050)
+- [6. Hệ thống Tài liệu Kỹ thuật (Documentation)](#-6-hệ-thống-tài-liệu-kỹ-thuật-documentation)
+- [7. Đóng góp & Cộng đồng (Contributing)](#-7-đóng-góp--cộng-đồng-contributing)
+- [8. Đơn vị Tổ chức & Thống kê Dự án](#-8-đơn-vị-tổ-chức--thống-kê-dự-án)
 
 </details>
 
 ---
 
-## 1. Bài toán & 6 Điểm đau Thực tế
-
-Dự án **DX-TwinOS** giải quyết trực diện **6 Điểm đau** được nêu trong **Đề thi OLP 2026** và **Tài liệu Hướng dẫn DX-OS**:
-
-| # | Điểm đau (Pain Point) | Giải pháp Kiến trúc trong `DX-TwinOS` |
-| :--- | :--- | :--- |
-| **1** | **Ốc đảo dữ liệu (Data Silos)**: Mua phần mềm rời rạc, phải xuất Excel gửi qua Zalo. | Hợp nhất toàn bộ dữ liệu về **1 Nguồn Sự thật Duy nhất (`PostgreSQL SSOT`)** + **`RustFS S3`**. |
-| **2** | **Bẫy Nguyên khối (Monolithic)**: Sửa 1 ô nhập liệu tốn hàng trăm triệu, lệ thuộc 1 hãng. | Kiến trúc **Lắp ghép (Composable)** qua `Traefik API Gateway` & chuẩn `NGSI-LD`. |
-| **3** | **Mất Chủ quyền số**: Phần mềm đóng trên đám mây ngoại tăng giá hoặc khóa tài khoản. | **100% Open-Core (`Apache-2.0`)** & **Local-First AI (`Ollama`)** chạy hoàn toàn trên máy chủ nội bộ. |
-| **4** | **Áp lực đào thải >900.000 SME**: Chi phí chuyển đổi số quá sức chịu đựng của doanh nghiệp nhỏ. | **0đ chi phí bản quyền**, đóng gói gọn nhẹ bằng `Docker Compose` chạy mượt trên 1 máy chủ nhỏ. |
-| **5** | **Bẫy "Ảo tưởng công nghệ"**: Mua nhiều app nhưng vẫn giao việc qua nhóm chat trôi tin nhắn. | Chuẩn hóa không gian **[H]** (`Keycloak SSO` + thư mục `P.A.R.A`) gắn chặt vào luồng **[P]** (`Kestra`). |
-| **6** | **Bẫy "Rác đầu vào - Rác đầu ra"**: Đưa AI vào khi dữ liệu bẩn gây ảo giác số liệu. | Đặt rào chắn **`Poka-yoke` [P]** chặn lỗi ngay tại biểu mẫu trước khi cho **4 Tác tử AI [I]** đọc. |
-
----
-
-## 🚀 2. Khởi chạy Nhanh (Quick Start — 1 Câu lệnh)
+## 🚀 1. Khởi chạy Nhanh (Quick Start — 1 Câu lệnh)
 
 ### Yêu cầu Môi trường (Prerequisites)
 
@@ -122,7 +106,7 @@ just audit-zero-bundling
 
 ---
 
-## 🛠️ 3. Danh mục Công nghệ Lõi Nguồn mở (Technology Stack)
+## 🛠️ 2. Danh mục Công nghệ Lõi Nguồn mở (Technology Stack)
 
 ### Tầng 1 — Hạ tầng Lõi Nguồn mở (`Headless PaaS — Zero UI`)
 
@@ -145,7 +129,7 @@ just audit-zero-bundling
 
 ---
 
-## 📂 4. Cấu trúc Cây Thư mục Chuẩn PoF & GitOps
+## 📂 3. Cấu trúc Cây Thư mục Chuẩn PoF & GitOps
 
 ```text
 dx-twinos/
@@ -179,7 +163,7 @@ dx-twinos/
 
 ---
 
-## ⚡ 5. Bảng Tham chiếu Lệnh Tự động hóa (`just` & `make`)
+## ⚡ 4. Bảng Tham chiếu Lệnh Tự động hóa (`just` & `make`)
 
 ```bash
 # Khởi tạo & Vận hành Hệ thống
@@ -197,7 +181,7 @@ just lint-compose          # (hoặc: make lint-compose)        Kiểm tra cú p
 
 ---
 
-## 🏆 6. Tuân thủ Bộ Tiêu chí Nguồn mở Quốc gia (PoF 50/50)
+## 🏆 5. Tuân thủ Bộ Tiêu chí Nguồn mở Quốc gia (PoF 50/50)
 
 | Tiêu chí PoF (VFOSSA) | Giải pháp Thực thi trong `DX-TwinOS` | Minh chứng trong Repo |
 | :--- | :--- | :--- |
@@ -210,7 +194,7 @@ just lint-compose          # (hoặc: make lint-compose)        Kiểm tra cú p
 
 ---
 
-## 📖 7. Hệ thống Tài liệu Kỹ thuật (Documentation)
+## 📖 6. Hệ thống Tài liệu Kỹ thuật (Documentation)
 
 | Tài liệu | Nội dung Chi tiết |
 | :--- | :--- |
@@ -222,13 +206,13 @@ just lint-compose          # (hoặc: make lint-compose)        Kiểm tra cú p
 
 ---
 
-## 🤝 8. Đóng góp & Cộng đồng (Contributing)
+## 🤝 7. Đóng góp & Cộng đồng (Contributing)
 
 Chúng tôi hoan nghênh mọi đóng góp từ cộng đồng Phần mềm Tự do Nguồn mở! Vui lòng đọc kỹ [**Hướng dẫn Đóng góp (CONTRIBUTING.md)**](./CONTRIBUTING.md) và [**Quy tắc Ứng xử (CODE_OF_CONDUCT.md)**](./CODE_OF_CONDUCT.md) trước khi tạo Pull Request.
 
 ---
 
-## 🏛️ 9. Đơn vị Tổ chức & Thống kê Dự án
+## 🏛️ 8. Đơn vị Tổ chức & Thống kê Dự án
 
 <p align="center">
 	<a href="https://hutech.edu.vn/" target="_blank">
