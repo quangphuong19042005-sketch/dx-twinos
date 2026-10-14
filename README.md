@@ -10,9 +10,6 @@ SPDX-License-Identifier: Apache-2.0
 </p>
 
 <p align="center">
-	<a href="./apps/web-portal/index.html"><strong>🚀 Mở Buồng lái H-P-D-I (Live Cockpit) »</strong></a>
-	<br/>
-	<br/>
 	<a href="https://github.com/quangphuong19042005-sketch/dx-twinos/issues/new?template=bug_report.md">🐛 Báo lỗi (Report Bug)</a>
 	|
 	<a href="https://github.com/quangphuong19042005-sketch/dx-twinos/issues/new?template=feature_request.md">✨ Đề xuất Tính năng (Request Feature)</a>
