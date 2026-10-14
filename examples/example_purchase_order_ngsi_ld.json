@@ -1,0 +1,37 @@
+{
+  "_comment": "SPDX-FileCopyrightText: 2026 DX-TwinOS Contributors | SPDX-License-Identifier: Apache-2.0",
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:PurchaseInvoice:INV-2026-0042",
+  "type": "PurchaseInvoice",
+  "supplierTaxCode": {
+    "type": "Property",
+    "value": "0312345678"
+  },
+  "totalAmountVND": {
+    "type": "Property",
+    "value": 125000000,
+    "unitCode": "VND"
+  },
+  "rustfsDocumentUri": {
+    "type": "Property",
+    "value": "s3://dxos-para-storage/projects/q4-procurement/INV-2026-0042.pdf"
+  },
+  "auditConfidenceScore": {
+    "type": "Property",
+    "value": 0.985
+  },
+  "humanInTheLoopApproval": {
+    "type": "Property",
+    "value": {
+      "approved": true,
+      "approverRole": "manager_approver",
+      "lineageSha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    }
+  },
+  "refWarehouseZone": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:WarehouseZone:WH-HCM-01"
+  }
+}

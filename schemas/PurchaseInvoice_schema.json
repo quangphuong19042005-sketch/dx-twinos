@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/quangphuong19042005-sketch/dx-twinos/schemas/PurchaseInvoice_schema.json",
+  "title": "DX-TwinOS PurchaseInvoice NGSI-LD Schema (Poka-yoke Guardrail)",
+  "description": "SPDX-License-Identifier: Apache-2.0 | Schema kiểm duyệt dữ liệu đầu vào chống rác (Poka-yoke) theo chuẩn ETSI NGSI-LD",
+  "type": "object",
+  "required": ["@context", "id", "type", "supplierTaxCode", "totalAmountVND", "rustfsDocumentUri"],
+  "properties": {
+    "@context": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^urn:ngsi-ld:PurchaseInvoice:[A-Z0-9-]+$"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["PurchaseInvoice"]
+    },
+    "supplierTaxCode": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "const": "Property" },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9]{10}([0-9]{3})?$",
+          "description": "Poka-yoke: Mã số thuế bắt buộc gồm 10 hoặc 13 chữ số hợp lệ"
+        }
+      }
+    },
+    "totalAmountVND": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "const": "Property" },
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Poka-yoke: Tổng tiền hóa đơn bắt buộc > 0 (Chặn tuyệt đối lỗi nhập số âm)"
+        }
+      }
+    },
+    "rustfsDocumentUri": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "const": "Property" },
+        "value": {
+          "type": "string",
+          "pattern": "^s3://dxos-para-storage/(projects|areas|resources|archives)/.+\\.pdf$"
+        }
+      }
+    }
+  }
+}
